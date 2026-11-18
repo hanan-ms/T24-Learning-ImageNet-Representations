@@ -66,6 +66,19 @@ The same six validation images were reconstructed with the posterior-mean decodi
 
 The dataset's `metadata.csv` lists `image_name,image_path,synset,label` with **12,810 rows** and **10 class labels (0–9)**; the feature-classification evaluation should use `train_indices.npy` and `val_indices.npy` to align rows and avoid leakage. Do not use the reserved test set for model selection.
 
+## Preliminary classification evaluation: frozen E3 vs E4 encoders
+
+A linear probe was trained separately on the frozen posterior-mean features from E3 (128 features) and E4 (64 features), using the same 11,529 train / 1,281 validation indices and a `StandardScaler` + `LogisticRegression(max_iter=2000)` classifier.
+
+| Metric | E3 | E4 |
+|---|---:|---:|
+| Validation accuracy | **47.54%** | 42.86% |
+| Balanced accuracy | **47.32%** | 42.67% |
+
+E3 leads by **4.68 percentage points** in validation accuracy. This supports choosing E3 for the **current linear-probe task** even though E4 has a slightly lower reconstruction pixel MSE. However, E3 and E4 differ in latent dimension as well as training beta; the classification comparison does not attribute the improvement to one isolated factor. Label/array alignment has yet to be independently verified and the classifier results are user-reported, so these remain **preliminary validation results**, not test results.
+
+See [E3 vs E4 classification details](classification/E3_vs_E4_linear_probe_preliminary.md) and [E3 per-class report](classification/E3_linear_probe_preliminary.md).
+
 ## Posterior collapse: concept and evidence
 
 Posterior collapse occurs if the learned approximate posterior `q(z|x)` becomes too similar to the prior `p(z) = N(0,I)` and the decoder learns to ignore the input-dependent latent representation. It is commonly associated with **KL approaching zero** and **few active latent units**, potentially accompanied by poor or generic reconstructions.
