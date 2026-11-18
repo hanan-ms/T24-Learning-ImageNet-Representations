@@ -57,6 +57,15 @@ Hypotheses were **committed before E2–E6**, but **E1 had already been trained*
 
 The selected weights are in the **E3 epoch-20 checkpoint** on [Google Drive](https://drive.google.com/file/d/1RvYug7dPSXC1YuVNoEC67lg2w_yTJDc7/view). To load with the repository's `vae.py`, instantiate `VAE(latent_dim=128)`, read the checkpoint with PyTorch, and load `ckpt["model_state"]`. The dataset and checkpoints remain on Drive rather than in Git because of size.
 
+
+## Qualitative reconstruction check: E3 versus E4
+
+The same six validation images were reconstructed with the posterior-mean decoding `decoder(mu(x))` from the saved epoch-20 checkpoints. See [side-by-side Original / E3 / E4 grid on Google Drive](https://drive.google.com/file/d/1TsbPtCPc1NcFqxHNxqn0OKpaFdexHd-r/view).
+
+**Observation:** Both models reproduce broad composition, foreground/background color regions and some object silhouettes, but lose high-frequency detail (faces, fine edges, texture). E4 often shows somewhat better object shape definition and color contrast in these six examples (notably the dark footwear), although the differences are modest and image-dependent; neither output is photorealistically sharp. This aligns with E4's marginally lower validation pixel MSE (**0.017229** versus E3's **0.017414**) but is not a blinded perceptual evaluation. **E3 remains the selected model by the declared negative-ELBO criterion**, while E4 can be kept as a supplementary reconstruction-focused comparison.
+
+The dataset's `metadata.csv` lists `image_name,image_path,synset,label` with **12,810 rows** and **10 class labels (0–9)**; the feature-classification evaluation should use `train_indices.npy` and `val_indices.npy` to align rows and avoid leakage. Do not use the reserved test set for model selection.
+
 ## Posterior collapse: concept and evidence
 
 Posterior collapse occurs if the learned approximate posterior `q(z|x)` becomes too similar to the prior `p(z) = N(0,I)` and the decoder learns to ignore the input-dependent latent representation. It is commonly associated with **KL approaching zero** and **few active latent units**, potentially accompanied by poor or generic reconstructions.
