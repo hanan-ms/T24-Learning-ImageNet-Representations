@@ -2,87 +2,101 @@
 
 **Team T24 — CSE473 Computational Intelligence**
 
-This private repository is for the **full team project**. Its current content covers the **convolutional VAE baseline and the start of the six-run VAE ablation study**; GAN, VAE-GAN, latent-space analysis, classification and final reporting are future team work.
+Private team repository for the full project. The **six-run VAE study is complete**. GAN/VAE-GAN, downstream classification, latent-space analyses and full report are separate team work.
 
-## Current files
+## VAE study deliverables
 
-- `vae.py`: from-scratch PyTorch convolutional encoder, decoder, VAE with reparameterization, and Gaussian squared-error reconstruction + beta-weighted KL loss.
-- `train_vae.py`: original 20-epoch standalone **baseline reproduction** script with checkpoint resume. This script is **not** the six-run notebook/function.
-- `results/baseline/vae_baseline_evaluation.json`: validation metrics from the **original** 20-epoch baseline run.
-- `results/baseline/vae_baseline_run_record.json`: original run settings, time, memory and checkpoint SHA-256.
-- `results/E1_Baseline/history.json` and `summary.json`: 20 epochs of E1 training/validation and its final metrics.
-- `results/E2_Latent32/history.json` and `summary.json`: 20 epochs of E2 (latent dimension 32) and its final metrics.
-- `results/E3_Latent128/history.json` and `summary.json`: 20 epochs of E3 (latent dimension 128) and its final metrics.
-- `results/E4_Beta0_5/history.json` and `summary.json`: 20 epochs of E4 (beta=0.5) and its final metrics.
-- `results/E5_Beta2/history.json` and `summary.json`: 20 epochs of E5 (beta=2) and its final metrics.
-- `results/predictions.md`: hypotheses for E2–E6, committed **after E1** and before the remaining planned runs.
+| Location | Contents |
+|---|---|
+| [`vae.py`](vae.py) | PyTorch convolutional encoder, reparameterization, decoder and beta-VAE loss |
+| [`train_vae.py`](train_vae.py) | Original standalone 20-epoch baseline training script |
+| [`run_vae_study.py`](run_vae_study.py) | Standalone runner recreating the six study configurations; supports resume; **newly reconstructed and not yet end-to-end tested** |
+| [`plot_vae_study.py`](plot_vae_study.py) | Regenerate study curves from committed JSON histories |
+| [`results/predictions.md`](results/predictions.md) | Hypotheses for E2–E6 (committed before those runs); note E1 had already been completed |
+| [`results/analysis_report.md`](results/analysis_report.md) | Full comparison, interpretations, selection rationale, posterior-collapse discussion and methodology limitations |
+| [`results/experiment_comparison.csv`](results/experiment_comparison.csv) | Machine-readable six-run metrics |
+| [`results/plots/`](results/plots/) | Validation reconstruction, KL and negative ELBO figures |
+| `results/E1_Baseline/` through `results/E6_Warmup/` | Each experiment's **20-epoch** `history.json` and `summary.json` |
+| [`results/baseline/`](results/baseline/) | Separate original baseline evaluation and run metadata |
 
-### Architecture
+## Experimental setup
 
-Input: 64×64×3 RGB (normalized to [0,1]). Four stride-2 convolution layers with output channels 32, 64, 128, 256. Encoder outputs a mean and log-variance vector. Sample `z = mean + exp(0.5 * logvar) * epsilon` where `epsilon ~ N(0,I)`. The decoder uses a linear layer and four transposed convolutions to reconstruct 64×64×3 RGB.
+Images: **64×64 RGB**, with **11,529 training and 1,281 validation images** from a 10-class ImageNet subset. Encoder output-channel progression: **32 → 64 → 128 → 256** with four stride-2 convolutions. The encoder returns a mean and log-variance for a Gaussian approximate posterior, sampled using `z = mean + exp(0.5 * logvar) * epsilon`; the decoder reconstructs the input via a linear layer and four transposed convolutions.
 
-Loss per image averaged over a batch: **sum of squared pixel errors + beta × KL divergence**. For the stated fixed-variance Gaussian reconstruction model (variance 0.5), the squared-error term is the negative Gaussian log-likelihood **up to an additive constant**. Reported negative ELBO values omit this constant.
+Loss = **per-image sum of squared pixel errors averaged over a batch** + training beta × **KL(q(z|x) || N(0,I))**. The squared-error term corresponds to a fixed-variance Gaussian negative log likelihood up to an additive constant. When comparing runs, **validation negative ELBO is always evaluated with beta=1**, even if training beta differs.
 
-### Baseline reference results
+Shared settings: 20 epochs, batch 128, Adam learning rate 0.001, random seed 42. All runs are initialized independently; each experiment changes one factor from E1.
 
-Original 20-epoch baseline (not identical to E1): validation pixel MSE **0.018248**, reconstruction loss **241.9633**, KL **56.3608**, negative ELBO **298.3241**, active units **63/64**. Recorded training time **62.10 s**; peak allocated GPU memory **179.13 MiB**; Tesla T4. See JSON files for exact values.
+| Run | Latent dim | Training beta | KL warm-up |
+|---|---:|---:|---|
+| E1_Baseline | 64 | 1 | Off |
+| E2_Latent32 | 32 | 1 | Off |
+| E3_Latent128 | 128 | 1 | Off |
+| E4_Beta0_5 | 64 | 0.5 | Off |
+| E5_Beta2 | 64 | 2 | Off |
+| E6_Warmup | 64 | 1 | On: increase from 0.1 to 1 over 10 epochs |
 
-New six-run study **E1 (epoch 20)**: pixel MSE **0.018563**, validation reconstruction **249.324**, KL **56.249**, negative ELBO at beta=1 **305.572**, active units **61/64**. The best **reported epoch-level** E1 negative ELBO was **300.984 at epoch 19**; the saved checkpoint on Drive is epoch 20. Stochastic decoder reconstructions can cause evaluation variation.
+## Completed results — epoch 20
 
-Completed **E2, latent dimension 32 (epoch 20)**: pixel MSE **0.020070**, validation reconstruction **259.918**, KL **47.332**, negative ELBO at beta=1 **307.249**, active units **32/32**. Run time over the logged training+validation epochs **60.59 s**, peak allocated GPU memory **149.05 MiB**. E1 corresponding values: **66.51 s**, **153.66 MiB**.
+| Run | Validation pixel MSE ↓ | KL | Validation negative ELBO (beta=1) ↓ | Active units |
+|---|---:|---:|---:|---:|
+| E1 | 0.018563 | 56.25 | 305.57 | 61/64 |
+| E2 | 0.020070 | 47.33 | 307.25 | 32/32 |
+| **E3** | **0.017414** | **58.75** | **295.68** | **124/128** |
+| E4 | **0.017229** | 80.84 | 303.89 | 64/64 |
+| E5 | 0.020310 | 36.12 | 312.94 | 64/64 |
+| E6 | 0.018536 | 58.15 | 305.86 | 60/64 |
 
-Completed **E3, latent dimension 128 (epoch 20)**: pixel MSE **0.017414**, validation reconstruction **236.923**, KL **58.754**, negative ELBO at beta=1 **295.677**, active units **124/128**. Logged epoch-loop training+validation time **58.42 s**, peak allocated GPU memory **162.87 MiB**. At epoch 20, E3 has the lowest validation negative ELBO of E1/E2/E3.
+**Selected for further study: E3_Latent128**, since it has the lowest validation negative ELBO at the common fixed 20-epoch budget. **E4** has the lowest pixel reconstruction MSE but a higher KL, resulting in a worse negative ELBO under beta=1. E6 KL warm-up did not materially improve results over E1. No run showed evidence of **complete** posterior collapse based on KL and active-unit counts, although partial latent underutilization is still possible.
 
-Completed **E4, beta=0.5 (epoch 20)**: pixel MSE **0.017229**, validation reconstruction **223.042**, KL **80.843**, negative ELBO evaluated at beta=1 **303.885**, active units **64/64**. Logged training+validation epoch-loop time **56.63 s**, peak allocated GPU memory **153.66 MiB**. E4 gives a lower reconstruction MSE than E1/E2/E3 but E3 remains best on beta=1 validation negative ELBO.
+For timing, peak GPU memory, numeric precision, figures and limitations, see [the full study report](results/analysis_report.md).
 
-Completed **E5, beta=2 (epoch 20)**: pixel MSE **0.020310**, validation reconstruction **276.825**, KL **36.117**, negative ELBO evaluated at beta=1 **312.942**, active units **64/64**. Logged training+validation epoch-loop time **57.24 s**, peak allocated GPU memory **153.66 MiB**. E5 reduced KL but worsened reconstruction relative to E1. The different run times may reflect GPU runtime variation, not just model capacity. Pixel MSE is measured on `decoder(mean)`, while ELBO reconstruction is sampled from the posterior.
+### Validation curves
 
-### Study design (20 epochs per run)
+![Validation reconstruction](results/plots/validation_reconstruction.svg)
 
-| Run | Latent size | Training beta | KL warm-up |
-| --- | ---: | ---: | --- |
-| E1 baseline | 64 | 1 | Off |
-| E2 small latent | 32 | 1 | Off |
-| E3 large latent | 128 | 1 | Off |
-| E4 low beta | 64 | 0.5 | Off |
-| E5 high beta | 64 | 2 | Off |
-| E6 warm-up | 64 | 1 | On, first 10 epochs |
+![Validation KL](results/plots/validation_kl.svg)
 
-Compare all runs by **validation negative ELBO evaluated with beta=1**, validation reconstruction and KL, pixel MSE, active latent units (variance of posterior mean across validation examples >0.01), runtime, peak GPU memory and train/validation curves. **E1–E5 are complete; E6 is pending.**
+![Validation negative ELBO](results/plots/validation_negative_elbo.svg)
 
-## Data and model checkpoints (Google Drive)
+## Model checkpoints and data — Google Drive
 
-Binary dataset, checkpoints, and images are kept on Drive rather than Git:
+Large data and model weights remain on Google Drive, **not** Git. Team members must have appropriate Drive sharing permissions.
 
 - [T24 VAE Results folder](https://drive.google.com/drive/folders/13Dd6eMQw5WgDvtS75a2h4Qf71xs8T7A5)
-- [Original baseline checkpoint (epoch 20)](https://drive.google.com/file/d/1US8y1jP3kFUNhqHgGHwFSbYWOc4yca17/view)
-- [Six experiments folder](https://drive.google.com/drive/folders/11uIykXqDXNIukItKjxJA81N2B253q0rB)
-- [E1 epoch-20 checkpoint](https://drive.google.com/file/d/1k1mF9-VPvdCLs8cr3O2N7gspdpdIgBGY/view)
-- [E2 epoch-20 checkpoint](https://drive.google.com/file/d/1BDwHuDl8Yqd53TBiQzAsbLrgDMdpSVNg/view)
-- [E3 epoch-20 checkpoint](https://drive.google.com/file/d/1RvYug7dPSXC1YuVNoEC67lg2w_yTJDc7/view)
-- [E4 epoch-20 checkpoint](https://drive.google.com/file/d/1FFmo_oNZNxnN6HJqOwyGgwnvyy_c6xtj/view)
-- [E5 epoch-20 checkpoint](https://drive.google.com/file/d/1obj0nJ1BwHwhzkEyzODoj9QFzE9qQU33/view)
-- [Original baseline training curves](https://drive.google.com/file/d/15V4r2NNd_BnKg1EJQUScUX7EYFJBsdUo/view)
-- [Original baseline reconstruction examples](https://drive.google.com/file/d/149Mz3JF7Cu2_PbdFMrjzBeL95ZPmXhiS/view)
+- [Six-experiment checkpoints folder](https://drive.google.com/drive/folders/11uIykXqDXNIukItKjxJA81N2B253q0rB)
+- [Selected E3 epoch-20 checkpoint](https://drive.google.com/file/d/1RvYug7dPSXC1YuVNoEC67lg2w_yTJDc7/view)
+- [Original baseline checkpoint](https://drive.google.com/file/d/1US8y1jP3kFUNhqHgGHwFSbYWOc4yca17/view)
+- [Original baseline reconstruction example grid](https://drive.google.com/file/d/149Mz3JF7Cu2_PbdFMrjzBeL95ZPmXhiS/view)
 
-Drive access is separately controlled; team members may need sharing permission.
+For the selected model, instantiate `VAE(latent_dim=128)`, load the E3 checkpoint using `torch.load(..., map_location="cpu", weights_only=True)`, then load `checkpoint["model_state"]`.
 
-## Running the original baseline
+## Reproduction
 
-1. In Google Colab, select a GPU and mount Drive:
-   ```python
-   from google.colab import drive
-   drive.mount("/content/drive")
-   ```
-2. Ensure `images.npy`, `train_indices.npy`, `val_indices.npy` are accessible under `/content/drive/MyDrive/T24_Dataset` (or change `DATA_DIR` in `train_vae.py`).
-3. Place `vae.py` and `train_vae.py` in the same working directory, and change `OUTPUT_DIR` in `train_vae.py` to a directory you can write.
-4. Run `python train_vae.py` with PyTorch and NumPy installed. **Be aware:** if a `checkpoint.pth` already exists at `OUTPUT_DIR`, the script resumes from it. Set a fresh output directory for a new run.
+**Important provenance:** the six archived run histories originated from the team's Google Colab notebook. The independently reconstructed `run_vae_study.py` follows the documented architecture, data processing, training/evaluation loop and checkpoint schema, **but has not yet been executed end-to-end**, and it is **not a substitute for committing the original Colab notebook**. Keep experiment history and predictions in Git rather than replacing them with fresh results.
 
-The separate E1–E6 experiment loop was executed in a Colab notebook and is **not yet committed as a runnable script**. Its recorded E1 history and checkpoint are available above. To reproduce the study completely, the team should commit that notebook or a standalone experiment runner next.
+In Colab, mount Drive, install or import PyTorch and NumPy, then from a checkout of this repository run:
 
-## Status and integrity
+```bash
+python run_vae_study.py --run E3_Latent128 \
+    --data-dir /content/drive/MyDrive/T24_Dataset \
+    --output-dir /content/drive/MyDrive/T24_VAE_Results/VAE_6_Experiments
+```
 
-- `results/predictions.md` explicitly notes that E1 was run before predictions were written; do **not** claim E1 was pre-registered.
-- The original baseline checkpoint SHA-256 is recorded in `vae_baseline_run_record.json`; the team should verify it after downloading.
-- Keep large `.npy`, `.pth`, image datasets and cache files out of Git. 
-- No test-set model selection. Use validation for comparing models; preserve the test split for final evaluation.
+**Warning:** if the checkpoint at that output path already exists, the script resumes it or reports it complete; choose a **new output directory** for an independent retraining. The input study expects raw pixel values in 0–255 and normalizes once. If dataset or results folders were moved, change the CLI paths. To regenerate plots from existing histories:
+
+```bash
+python plot_vae_study.py
+```
+
+The original `train_vae.py` is a separate baseline-only script; its hardcoded Colab paths may need updating.
+
+## Integrity and study limitations
+
+- E1 was **trained before** hypotheses were recorded. Do not claim E1 was pre-registered. E2–E6 predictions were committed before those runs.
+- The original baseline is a **different training run** from E1. Its evaluation and checkpoint SHA-256 are in `results/baseline/`; do not mix these two baseline metrics.
+- The negative ELBO uses a stochastic posterior sample and may vary slightly between evaluation calls; pixel MSE is calculated using `decoder(posterior_mean)`.
+- The logged runtime is the sum of epoch training + validation time (not session wall clock); memory is peak **allocated** CUDA memory in MiB, not reserved or physical GPU occupancy.
+- Single training seed, finite training duration and stochastic validation limit statistical certainty. Final best-model claims should be qualified until additional controlled validation.
+- Do not use test data for tuning or run selection. Save test evaluation for the final locked model.
+- The team should archive the exact **`.ipynb` Colab experiment notebook** with environment versions for provenance and add its own GAN/VAE-GAN work on separate commits/branches.
