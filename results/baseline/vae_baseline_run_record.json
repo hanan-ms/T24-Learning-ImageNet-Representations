@@ -1,0 +1,28 @@
+{
+    "model": "Convolutional VAE",
+    "latent_dim": 64,
+    "beta": 1.0,
+    "epochs": 20,
+    "global_steps": 1820,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "batch_size": 128,
+    "training_images": 11529,
+    "validation_images": 1281,
+    "training_time_seconds": 62.09631255999875,
+    "peak_gpu_memory_mb": 179.12548828125,
+    "hardware": "Tesla T4",
+    "evaluation": {
+        "latent_dim": 64,
+        "beta": 1.0,
+        "epochs": 20,
+        "validation_images": 1281,
+        "reconstruction_mse": 0.018248148219848468,
+        "reconstruction_loss": 241.963331355051,
+        "kl_divergence": 56.36078252502013,
+        "negative_elbo_without_constant": 298.32411388007114,
+        "active_latent_units": 63,
+        "reconstruction_model": "Gaussian variance 0.5"
+    },
+    "checkpoint_sha256": "8293f0f69fb75a3b4e707c8e4c392acb6373f802545945d74cb4cf2fec0ee2dc"
+}
