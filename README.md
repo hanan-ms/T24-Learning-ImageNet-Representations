@@ -59,6 +59,19 @@ For timing, peak GPU memory, numeric precision, figures and limitations, see [th
 
 ![Validation negative ELBO](results/plots/validation_negative_elbo.svg)
 
+## Preliminary frozen-encoder classification
+
+The same train/validation split was used with a separate `StandardScaler + LogisticRegression(max_iter=2000)` linear probe trained on each frozen encoder's posterior-mean features:
+
+| Encoder | Features | Validation accuracy | Balanced accuracy |
+|---|---:|---:|---:|
+| **E3 (latent 128)** | 128 | **47.54%** | **47.32%** |
+| E4 (beta 0.5) | 64 | 42.86% | 42.67% |
+
+E3 performed better by **4.68 percentage points** in validation accuracy despite E4's lower reconstruction MSE. The feature sizes and training beta both differ; this comparison does not isolate a causal factor. **These remain preliminary user-reported validation scores** pending verification of the image/metadata row alignment. No test-set results are claimed.
+
+See the [linear-probe comparison and caveats](results/classification/E3_vs_E4_linear_probe_preliminary.md).
+
 ## Model checkpoints and data — Google Drive
 
 Large data and model weights remain on Google Drive, **not** Git. Team members must have appropriate Drive sharing permissions.
