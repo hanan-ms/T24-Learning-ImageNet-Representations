@@ -10,7 +10,8 @@ This private repository is for the **full team project**. Its current content co
 - `train_vae.py`: original 20-epoch standalone **baseline reproduction** script with checkpoint resume. This script is **not** the six-run notebook/function.
 - `results/baseline/vae_baseline_evaluation.json`: validation metrics from the **original** 20-epoch baseline run.
 - `results/baseline/vae_baseline_run_record.json`: original run settings, time, memory and checkpoint SHA-256.
-- `results/E1_Baseline/history.json`: 20 epochs of training/validation for the **new ablation-study E1**; this is a separate fresh training run.
+- `results/E1_Baseline/history.json` and `summary.json`: 20 epochs of E1 training/validation and its final metrics.
+- `results/E2_Latent32/history.json` and `summary.json`: 20 epochs of E2 (latent dimension 32) and its final metrics.
 - `results/predictions.md`: hypotheses for E2–E6, committed **after E1** and before the remaining planned runs.
 
 ### Architecture
@@ -25,6 +26,8 @@ Original 20-epoch baseline (not identical to E1): validation pixel MSE **0.01824
 
 New six-run study **E1 (epoch 20)**: pixel MSE **0.018563**, validation reconstruction **249.324**, KL **56.249**, negative ELBO at beta=1 **305.572**, active units **61/64**. The best **reported epoch-level** E1 negative ELBO was **300.984 at epoch 19**; the saved checkpoint on Drive is epoch 20. Stochastic decoder reconstructions can cause evaluation variation.
 
+Completed **E2, latent dimension 32 (epoch 20)**: pixel MSE **0.020070**, validation reconstruction **259.918**, KL **47.332**, negative ELBO at beta=1 **307.249**, active units **32/32**. Run time over the logged training+validation epochs **60.59 s**, peak allocated GPU memory **149.05 MiB**. E1 corresponding values: **66.51 s**, **153.66 MiB**. Pixel MSE is measured on `decoder(mean)`, while ELBO reconstruction is sampled from the posterior.
+
 ### Study design (20 epochs per run)
 
 | Run | Latent size | Training beta | KL warm-up |
@@ -36,7 +39,7 @@ New six-run study **E1 (epoch 20)**: pixel MSE **0.018563**, validation reconstr
 | E5 high beta | 64 | 2 | Off |
 | E6 warm-up | 64 | 1 | On, first 10 epochs |
 
-Compare all runs by **validation negative ELBO evaluated with beta=1**, validation reconstruction and KL, pixel MSE, active latent units (variance of posterior mean across validation examples >0.01), runtime, peak GPU memory and train/validation curves. **E2–E6 have not yet been uploaded.**
+Compare all runs by **validation negative ELBO evaluated with beta=1**, validation reconstruction and KL, pixel MSE, active latent units (variance of posterior mean across validation examples >0.01), runtime, peak GPU memory and train/validation curves. **E1 and E2 are complete; E3–E6 are pending.**
 
 ## Data and model checkpoints (Google Drive)
 
