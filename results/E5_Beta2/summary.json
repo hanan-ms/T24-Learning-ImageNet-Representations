@@ -1,0 +1,20 @@
+{
+  "name": "E5_Beta2",
+  "epoch": 20,
+  "latent_dim": 64,
+  "target_beta": 2,
+  "warmup": false,
+  "epochs": 20,
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "seed": 42,
+  "validation_reconstruction_per_image": 276.82469124834955,
+  "validation_kl_per_image": 36.11700033862362,
+  "validation_negative_elbo_beta1_without_constant": 312.94169158697315,
+  "validation_pixel_mse_decoder_mean": 0.020310360491430885,
+  "active_units": 64,
+  "training_plus_validation_time_seconds": 57.2351926639999,
+  "peak_allocated_gpu_memory_mib": 153.6552734375,
+  "source": "history.json",
+  "notes": "Epoch 20 metrics; negative ELBO reconstruction uses sampled z while pixel MSE is computed using decoder(mean). Time is epoch loops including validation and excludes initialization/data loading outside loops."
+}
