@@ -1,0 +1,7 @@
+experiment,latent_dim,target_beta,kl_warmup,epochs,val_mse_decoder_mean,val_recon_per_image,val_kl_per_image,val_negative_elbo_beta1,active_units,total_units,time_training_validation_s,peak_gpu_allocated_mib
+E1_Baseline,64,1,false,20,0.01856312,249.3239,56.2486,305.5724,61,64,66.5088,153.6553
+E2_Latent32,32,1,false,20,0.02007042,259.9177,47.3318,307.2495,32,32,60.5944,149.0459
+E3_Latent128,128,1,false,20,0.01741356,236.9232,58.7539,295.6771,124,128,58.4215,162.8740
+E4_Beta0_5,64,0.5,false,20,0.01722874,223.0424,80.8430,303.8854,64,64,56.6336,153.6553
+E5_Beta2,64,2,false,20,0.02031036,276.8247,36.1170,312.9417,64,64,57.2352,153.6553
+E6_Warmup,64,1,true,20,0.01853616,247.7106,58.1504,305.8610,60,64,56.8660,153.6553
