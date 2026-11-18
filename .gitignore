@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+
+# Large datasets and checkpoints
+*.npy
+*.npz
+*.pth
+*.pt
+*.ckpt
+*.zip
+
+# Local Colab outputs
+repro_run/
+outputs/
