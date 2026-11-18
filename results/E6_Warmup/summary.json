@@ -1,0 +1,21 @@
+{
+  "name": "E6_Warmup",
+  "epoch": 20,
+  "latent_dim": 64,
+  "target_beta": 1,
+  "warmup": true,
+  "warmup_epochs": 10,
+  "epochs": 20,
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "seed": 42,
+  "validation_reconstruction_per_image": 247.7106054635089,
+  "validation_kl_per_image": 58.15041665189625,
+  "validation_negative_elbo_beta1_without_constant": 305.86102211540515,
+  "validation_pixel_mse_decoder_mean": 0.01853616174282334,
+  "active_units": 60,
+  "training_plus_validation_time_seconds": 56.86595619799982,
+  "peak_allocated_gpu_memory_mib": 153.6552734375,
+  "source": "history.json",
+  "notes": "Epoch 20 metrics; negative ELBO reconstruction uses sampled z while pixel MSE is computed using decoder(mean). Time is epoch loops including validation and excludes initialization/data loading outside loops."
+}
