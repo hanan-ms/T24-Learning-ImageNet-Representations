@@ -14,6 +14,7 @@ This private repository is for the **full team project**. Its current content co
 - `results/E2_Latent32/history.json` and `summary.json`: 20 epochs of E2 (latent dimension 32) and its final metrics.
 - `results/E3_Latent128/history.json` and `summary.json`: 20 epochs of E3 (latent dimension 128) and its final metrics.
 - `results/E4_Beta0_5/history.json` and `summary.json`: 20 epochs of E4 (beta=0.5) and its final metrics.
+- `results/E5_Beta2/history.json` and `summary.json`: 20 epochs of E5 (beta=2) and its final metrics.
 - `results/predictions.md`: hypotheses for E2–E6, committed **after E1** and before the remaining planned runs.
 
 ### Architecture
@@ -32,7 +33,9 @@ Completed **E2, latent dimension 32 (epoch 20)**: pixel MSE **0.020070**, valida
 
 Completed **E3, latent dimension 128 (epoch 20)**: pixel MSE **0.017414**, validation reconstruction **236.923**, KL **58.754**, negative ELBO at beta=1 **295.677**, active units **124/128**. Logged epoch-loop training+validation time **58.42 s**, peak allocated GPU memory **162.87 MiB**. At epoch 20, E3 has the lowest validation negative ELBO of E1/E2/E3.
 
-Completed **E4, beta=0.5 (epoch 20)**: pixel MSE **0.017229**, validation reconstruction **223.042**, KL **80.843**, negative ELBO evaluated at beta=1 **303.885**, active units **64/64**. Logged training+validation epoch-loop time **56.63 s**, peak allocated GPU memory **153.66 MiB**. E4 gives a lower reconstruction MSE than E1/E2/E3 but E3 remains best on beta=1 validation negative ELBO. The different run times may reflect GPU runtime variation, not just model capacity. Pixel MSE is measured on `decoder(mean)`, while ELBO reconstruction is sampled from the posterior.
+Completed **E4, beta=0.5 (epoch 20)**: pixel MSE **0.017229**, validation reconstruction **223.042**, KL **80.843**, negative ELBO evaluated at beta=1 **303.885**, active units **64/64**. Logged training+validation epoch-loop time **56.63 s**, peak allocated GPU memory **153.66 MiB**. E4 gives a lower reconstruction MSE than E1/E2/E3 but E3 remains best on beta=1 validation negative ELBO.
+
+Completed **E5, beta=2 (epoch 20)**: pixel MSE **0.020310**, validation reconstruction **276.825**, KL **36.117**, negative ELBO evaluated at beta=1 **312.942**, active units **64/64**. Logged training+validation epoch-loop time **57.24 s**, peak allocated GPU memory **153.66 MiB**. E5 reduced KL but worsened reconstruction relative to E1. The different run times may reflect GPU runtime variation, not just model capacity. Pixel MSE is measured on `decoder(mean)`, while ELBO reconstruction is sampled from the posterior.
 
 ### Study design (20 epochs per run)
 
@@ -45,7 +48,7 @@ Completed **E4, beta=0.5 (epoch 20)**: pixel MSE **0.017229**, validation recons
 | E5 high beta | 64 | 2 | Off |
 | E6 warm-up | 64 | 1 | On, first 10 epochs |
 
-Compare all runs by **validation negative ELBO evaluated with beta=1**, validation reconstruction and KL, pixel MSE, active latent units (variance of posterior mean across validation examples >0.01), runtime, peak GPU memory and train/validation curves. **E1–E4 are complete; E5–E6 are pending.**
+Compare all runs by **validation negative ELBO evaluated with beta=1**, validation reconstruction and KL, pixel MSE, active latent units (variance of posterior mean across validation examples >0.01), runtime, peak GPU memory and train/validation curves. **E1–E5 are complete; E6 is pending.**
 
 ## Data and model checkpoints (Google Drive)
 
@@ -58,6 +61,7 @@ Binary dataset, checkpoints, and images are kept on Drive rather than Git:
 - [E2 epoch-20 checkpoint](https://drive.google.com/file/d/1BDwHuDl8Yqd53TBiQzAsbLrgDMdpSVNg/view)
 - [E3 epoch-20 checkpoint](https://drive.google.com/file/d/1RvYug7dPSXC1YuVNoEC67lg2w_yTJDc7/view)
 - [E4 epoch-20 checkpoint](https://drive.google.com/file/d/1FFmo_oNZNxnN6HJqOwyGgwnvyy_c6xtj/view)
+- [E5 epoch-20 checkpoint](https://drive.google.com/file/d/1obj0nJ1BwHwhzkEyzODoj9QFzE9qQU33/view)
 - [Original baseline training curves](https://drive.google.com/file/d/15V4r2NNd_BnKg1EJQUScUX7EYFJBsdUo/view)
 - [Original baseline reconstruction examples](https://drive.google.com/file/d/149Mz3JF7Cu2_PbdFMrjzBeL95ZPmXhiS/view)
 
