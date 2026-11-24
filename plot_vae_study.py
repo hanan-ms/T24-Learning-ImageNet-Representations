@@ -74,6 +74,34 @@ def save_plot(histories, key, title, ylabel, filename, start_epoch=1):
     plt.close(fig)
 
 
+
+def save_train_val_panels(histories, train_key, val_key, title, ylabel, filename):
+    """Render all six experiments as a 3 x 2 small-multiple comparison."""
+    fig, axes = plt.subplots(3, 2, figsize=(13, 12))
+    for i, name in enumerate(RUNS):
+        ax = axes.flat[i]
+        records = histories[name]
+        epochs = [r["epoch"] for r in records]
+        ax.plot(
+            epochs, [r[train_key] for r in records],
+            label="Training", linewidth=2
+        )
+        ax.plot(
+            epochs, [r[val_key] for r in records],
+            label="Validation", linewidth=2
+        )
+        ax.set_title(name)
+        ax.set_xlabel("Epoch")
+        ax.set_ylabel(ylabel)
+        ax.grid(True, alpha=0.25)
+        ax.legend(fontsize=9)
+    fig.suptitle(title, fontsize=16)
+    fig.tight_layout(rect=[0, 0.02, 1, 0.97])
+    for ext in ("png", "svg"):
+        fig.savefig(PLOTS / f"{filename}.{ext}", dpi=160)
+    plt.close(fig)
+
+
 def main():
     histories = load_histories()
     PLOTS.mkdir(parents=True, exist_ok=True)
@@ -86,6 +114,20 @@ def main():
         "Reconstruction + KL per image",
         "validation_negative_elbo_epochs10to20",
         start_epoch=10,
+    )
+    save_train_val_panels(
+        histories,
+        "train_recon", "val_recon",
+        "Training vs Validation Reconstruction (six experiments)",
+        "Per-image reconstruction SSE",
+        "train_vs_validation_reconstruction"
+    )
+    save_train_val_panels(
+        histories,
+        "train_kl", "val_kl",
+        "Training vs Validation KL (six experiments)",
+        "KL divergence per image",
+        "train_vs_validation_kl"
     )
     print(f"Saved VAE curves in {PLOTS}")
 
