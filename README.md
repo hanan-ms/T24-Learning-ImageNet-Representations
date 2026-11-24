@@ -4,6 +4,17 @@
 
 Private team repository for the full project. The **six-run VAE study is complete**. GAN/VAE-GAN, downstream classification, latent-space analyses and full report are separate team work.
 
+## Submission pack — Person 1 and Person 2
+
+**Both requested VAE workstreams are documented and the six original experiments are complete.**
+
+- **[Start here: complete VAE submission package](docs/vae_submission_package.md)** — each requirement mapped to its supporting code, figures and results.
+- **[Person 1: VAE Architecture & Implementation](docs/person1_vae_architecture.md)** — verified architecture, layer-wise dimensions, parameter counts, reparameterization and loss explanations.
+- **[Encoder/decoder architecture diagram](docs/vae_architecture.svg)** — input/output dimensions and the latent distribution path.
+- **[Person 2: Six VAE Experiments & Evaluation](docs/person2_vae_evaluation.md)** — metrics, model choice, KL warm-up and posterior-collapse discussion.
+- **[Training vs validation reconstruction](results/plots/train_vs_validation_reconstruction.svg)** and **[training vs validation KL](results/plots/train_vs_validation_kl.svg)** — six comparable panels in each figure.
+- **[Synthetic-data CPU smoke tests](tests/test_vae_smoke.py)** and **[GitHub Actions smoke workflow](.github/workflows/vae-smoke.yml)** — check model tensor shapes, losses, gradients, one-epoch runs and checkpoint resume. These tests are configured, but **a successful Actions run has not been verified in this session**; they do not replace a full 20-epoch reproduction.
+
 ## VAE study deliverables
 
 | Location | Contents |
